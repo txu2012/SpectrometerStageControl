@@ -10,11 +10,13 @@ using System.Windows.Forms;
 
 namespace SpectrometerStageControl
 {
-    public partial class Form1 : Form
+    public partial class FormMain : Form, IMainView
     {
-        public Form1()
+        public FormMain()
         {
             InitializeComponent();
         }
+
+        public void UpdateScreen() { }
     }
 }
