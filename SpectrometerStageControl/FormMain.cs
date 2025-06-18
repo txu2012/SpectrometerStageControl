@@ -12,11 +12,244 @@ namespace SpectrometerStageControl
 {
     public partial class FormMain : Form, IMainView
     {
+        #region Class Members
+        private MainPresenter presenter;
+        #endregion
+
         public FormMain()
         {
             InitializeComponent();
+
+            this.presenter = new MainPresenter();
+            this.presenter.AddMainView(this);
+
+            RefreshStage();
+            RefreshSpectrometer();
+            UpdateDisplay();
         }
 
-        public void UpdateScreen() { }
+        private bool updatingDisplay = false;
+        private FormChart formChart;
+        #region Interface Functions
+        public void UpdateDisplay() 
+        {
+            updatingDisplay = true;
+
+            if (presenter.StageConnected)
+            {
+                btnStageConnect.Enabled = false;
+                btnStageRefresh.Enabled = false;
+                btnStageDisconnect.Enabled = true;
+                cbStage.Enabled = false;
+            }
+            else
+            {
+                btnStageConnect.Enabled = true;
+                btnStageRefresh.Enabled = true;
+                btnStageDisconnect.Enabled = false;
+                cbStage.Enabled = true;
+            }
+
+            if (presenter.SpectrometerConnected)
+            {
+                btnSpecConnect.Enabled = false;
+                btnSpecRefresh.Enabled = false;
+                btnSpecDisconnect.Enabled = true;
+                cbSpectrometer.Enabled = false;
+            }
+            else
+            {
+                btnSpecConnect.Enabled = true;
+                btnSpecRefresh.Enabled = true;
+                btnSpecDisconnect.Enabled = false;
+                cbSpectrometer.Enabled = true;
+            }
+
+            pnControl.Enabled = (presenter.SpectrometerConnected || presenter.StageConnected);
+            gbStage.Enabled = presenter.StageConnected;
+            gbSpectrometer.Enabled = presenter.SpectrometerConnected;
+
+            if (gbStage.Enabled)
+                UpdateStageDisplay();
+
+            updatingDisplay = false;
+        }
+
+        private void UpdateStageDisplay()
+        {
+            if (presenter.StageConnected)
+            {
+                txtHomed.Text = (presenter.Stage.IsHomed) ? "Yes" : "No";
+                txtPosition.Text = presenter.Stage.CurrentPosition.ToString();
+            }
+        }
+
+        public void Log(string msg) 
+        {
+            rtbLog.AppendText(msg + "\r\n");
+            rtbLog.ScrollToCaret();
+        }
+
+        private void RefreshStage()
+        {
+            cbStage.DataSource = presenter.StageDevices;
+        }
+
+        private void RefreshSpectrometer()
+        {
+            cbStage.DataSource = presenter.SpectrometerDevices.Select(x => x.Id + "" + x.Name).ToList();
+        }
+        #endregion
+
+        #region Connection
+        private void btnStageConnect_Click(object sender, EventArgs e)
+        {
+            if (cbStage.SelectedItem != null)
+                presenter.ConnectStage((string)cbStage.SelectedItem);
+
+            UpdateDisplay();
+        }
+
+        private void btnSpecConnect_Click(object sender, EventArgs e)
+        {
+            if (cbSpectrometer.SelectedItem != null)
+                presenter.ConnectSpectrometer(cbSpectrometer.SelectedIndex);
+
+            UpdateDisplay();
+        }
+
+        private void btnStageDisconnect_Click(object sender, EventArgs e)
+        {
+            if (presenter.StageConnected)
+                presenter.DisconnectStage();
+
+            UpdateDisplay();
+        }
+
+        private void btnSpecDisconnect_Click(object sender, EventArgs e)
+        {
+            if (presenter.SpectrometerConnected)
+                presenter.DisconnectSpectrometer();
+
+            UpdateDisplay();
+        }
+
+        private void btnSpecRefresh_Click(object sender, EventArgs e)
+        {
+            RefreshSpectrometer();
+            UpdateDisplay();
+        }
+
+        private void btnStageRefresh_Click(object sender, EventArgs e)
+        {
+            RefreshStage();
+            UpdateDisplay();
+        }
+        #endregion
+
+        #region Stage Control
+        private void btnHome_Click(object sender, EventArgs e)
+        {
+            presenter.Stage.Home();
+            tmrMain.Enabled = true;
+        }
+
+        private void btnStageStop_Click(object sender, EventArgs e)
+        {
+            presenter.Stage.Stop();
+            tmrMain.Enabled = true;
+        }
+
+        private void btnMoveByNeg_Click(object sender, EventArgs e)
+        {
+            presenter.Stage.MoveRelative(false, nudStageMoveBy.Value);
+            tmrMain.Enabled = true;
+        }
+
+        private void btnMoveByPos_Click(object sender, EventArgs e)
+        {
+            presenter.Stage.MoveRelative(true, nudStageMoveBy.Value);
+            tmrMain.Enabled = true;
+        }
+
+        private void btnContFwd_Click(object sender, EventArgs e)
+        {
+            presenter.Stage.MoveContiuous(true);
+            tmrMain.Enabled = true;
+        }
+
+        private void btnContBack_Click(object sender, EventArgs e)
+        {
+            presenter.Stage.MoveContiuous(false);
+            tmrMain.Enabled = true;
+        }
+
+        private void nudStageMoveBy_ValueChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void nudStageRange_ValueChanged(object sender, EventArgs e)
+        {
+
+        }
+        #endregion
+
+        #region Spectrometer Control
+
+        private void btnSpectrumFull_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnSpectrumRange_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnChart_Click(object sender, EventArgs e)
+        {
+            
+            if (formChart == null || formChart.IsDisposed)
+                formChart = new FormChart(presenter);
+        }
+
+        private void nudCenterWave_ValueChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void nudWaveRange_ValueChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void nudWaveInc_ValueChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void nudIntegrationUs_ValueChanged(object sender, EventArgs e)
+        {
+
+        }
+        #endregion
+
+        private void btnRun_Click(object sender, EventArgs e)
+        {
+            presenter.RunLength();
+        }
+
+        private void tmrMain_Tick(object sender, EventArgs e)
+        {
+            if (presenter.Stage.StageState != MotorState.Stopped)
+            {
+                UpdateStageDisplay();
+            }
+            else
+            {
+                tmrMain.Enabled = false;
+            }
+        }
     }
 }

@@ -21,10 +21,10 @@ class SpectrometerRunner():
 if __name__ == "__main__":
     print('Starting program.')
     
-    #app = SpectrometerRunner()
-    
+    app = SpectrometerRunner()
     """
-    presenter = Presenter()
+    form = Form()
+    presenter = Presenter(form)
     
     spectrometer_devices = presenter.get_spectrometers()
     stage_devices = presenter.get_stages()
@@ -35,3 +35,5 @@ if __name__ == "__main__":
     presenter.home_stage()
     presenter.move_stage(1000)
     """
+    
+    

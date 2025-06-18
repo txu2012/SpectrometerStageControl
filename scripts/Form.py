@@ -18,9 +18,11 @@ class Form():
         self._status = tk.StringVar()
         self._lbl_speed = tk.StringVar()
         self._lbl_distance = tk.StringVar()
-        self._axis_status = [None, None, None]
         self._nud_distance = 0
-        self._distance_val = tk.DoubleVar()
+        self._distance_val = tk.IntVar()
+        self._min_wavelength_val = tk.IntVar()
+        self._max_wavelength_val = tk.IntVar()
+        self._increments_val = tk.IntVar()
         self._cb_convert = tk.IntVar()
         self._nud_convert = 0
         self._convert_val = tk.IntVar()
@@ -53,6 +55,43 @@ class Form():
         
     def on_closing(self):
         self._root_window.destroy()
+        
+    def update_view(self):
+        #if (self._presenter.IsConnected):
+        #    self._status.set("Connected")    
+        #    self.toggle_widgets(True)
+        #    self._btn_connect.config(state='disabled')
+        #    self._btn_disconnect.config(state='normal')
+        #else:
+        #    self._status.set("Disconnected")
+        #    self.toggle_widgets(False)
+        #    self._btn_connect.config(state='normal')
+        #    self._btn_disconnect.config(state='disabled')
+        
+        self._txt_speed.config(state='normal')
+        self._txt_speed.delete(1.0, tk.END)
+        self._txt_speed.insert(tk.END, f'{self._presenter.MotorStatus.Velocity}')
+        self._txt_speed.config(state='disabled')
+        
+        self._lbl_speed.set(f'Velocity({self._presenter.MotorStatus.Unit}/s): ')
+        self._lbl_distance.set(f'Distance({self._presenter.MotorStatus.Unit}):')
+        
+        if self._cb_convert.get()==1:
+            self._nud_convert.config(state='disabled')
+        else:
+            self._nud_convert.config(state='normal')
+            
+    def toggle_widgets(self, toggle: bool):
+        for widget in self._widget_toggles:
+            widget.configure(state='normal' if toggle else 'disabled')        
+            
+    def update_response(self, msg: str):
+        self._txt_response.config(state='normal')
+        self._txt_response.insert(tk.END, '\n'+msg)
+        self._txt_response.yview(tk.END)
+        self._txt_response.config(state='disabled')
+        
+        self.update_view()
         
     def create_connection_frame(self):        
         conn_frame = tk.LabelFrame(self._root_window, text="Connection", width=710, height=80)
@@ -111,11 +150,71 @@ class Form():
         # Responses
         self._txt_response = scrolledtext.ScrolledText(motor_frame, width=34)
         self._txt_response.config(state='disabled')
-        self._txt_response.place(x=410, height=360)
+        self._txt_response.place(x=410, y=8, height=360)
+        
+        # mm Conversion
+        convert_frame = tk.LabelFrame(motor_frame, text="Step/mm Conversion", width=250, height=45)
+        convert_frame.place(x=5, y=0)
+        
+        self._convert_val.set(34555)
+        self._nud_convert = tk.Spinbox(convert_frame, from_=0, to=50000, width=6, textvariable=self._convert_val)
+        self._nud_convert.grid(row=0, column=0, sticky="w")
+        tk.Label(convert_frame, text="steps/mm", width=8, height=1, anchor="w").grid(row=0, column=1)
+        convert_frame.grid_propagate(0)
+        
+        #self._widget_toggles.append(cb_convert)
+        self._widget_toggles.append(self._nud_convert)
+        
+        # Motor Parameters
+        parameter_frame = tk.Frame(motor_frame, width=400, height=50)
+        parameter_frame.place(x=5, y=50)
+        
+        # Distance range in steps from home position
+        tk.Label(parameter_frame, text="Distance Range +/- (steps): ", width=22, height=2, anchor="w").grid(row=0, column=0)
+        self._nud_distance = tk.Spinbox(parameter_frame, 
+                                        from_=0, 
+                                        to=100000, 
+                                        increment=1,
+                                        width=8, 
+                                        textvariable=self._distance_val,
+                                        command= self.nud_distance_value_updated)
+        self._nud_distance.grid(row=0, column=1, sticky="w")# make min/max updateable
+        #self._nud_distance.bind('<Return>', self.nud_distance_value_updated)
+        
+        # Wavelength range
+        tk.Label(parameter_frame, text="Wavelength Range: ", width=22, height=2, anchor="w").grid(row=1, column=0)
+        self._nud_min_wavelength = tk.Spinbox(parameter_frame, 
+                                        from_=0, 
+                                        to=100000, 
+                                        increment=1,
+                                        width=8, 
+                                        textvariable=self._min_wavelength_val,
+                                        command= self.nud_min_wl_value_updated)
+        self._nud_min_wavelength.grid(row=1, column=1, sticky="w")
+        tk.Label(parameter_frame, text=" - ", width=2, height=2, anchor="w").grid(row=1, column=2, padx=(3,3))
+        self._nud_max_wavelength = tk.Spinbox(parameter_frame, 
+                                        from_=0, 
+                                        to=100000, 
+                                        increment=1,
+                                        width=8, 
+                                        textvariable=self._max_wavelength_val,
+                                        command= self.nud_max_wl_value_updated)
+        self._nud_max_wavelength.grid(row=1, column=3, sticky="w")
+        
+        # Increments wavelength
+        tk.Label(parameter_frame, text="Increments (steps): ", width=22, height=2, anchor="w").grid(row=2, column=0)
+        self._nud_inc_wavelength = tk.Spinbox(parameter_frame, 
+                                        from_=0, 
+                                        to=100000, 
+                                        increment=1,
+                                        width=8, 
+                                        textvariable=self._increments_val,
+                                        command= self.nud_inc_value_updated)
+        self._nud_inc_wavelength.grid(row=2, column=1, sticky="w")
         
         # Homing/Limit
         button_frame = tk.Frame(motor_frame, width=300, height=50)
-        button_frame.place(x=5, y=2)
+        button_frame.place(x=5, y=250)
         
         btn_home_center = tk.Button(button_frame, text="Home", width=10, height=2, command= lambda: self.btn_home_clicked())
         btn_home_center.grid(row=0, column=0, padx=(0, 5))
@@ -129,26 +228,7 @@ class Form():
         #self._widget_toggles.append(btn_home_edge)
         #self._widget_toggles.append(btn_calc_limit)
         
-        # mm Conversion
-        convert_frame = tk.Frame(motor_frame, width=110, height=55)
-        convert_frame.place(x=270, y=0)
-        cb_convert = tk.Checkbutton(convert_frame, text='mm Convert',variable=self._cb_convert, onvalue=1, offvalue=0, command=self.cb_convert_checked, anchor="w")
-        cb_convert.grid(row=0, column=0, columnspan=2)
-        cb_convert.select()
-        
-        self._convert_val.set(160)
-        self._nud_convert = tk.Spinbox(convert_frame, from_=0, to=2000, width=4, textvariable=self._convert_val)
-        self._nud_convert.grid(row=1, column=0, sticky="w")
-        tk.Label(convert_frame, text="steps/mm", width=8, height=1, anchor="w").grid(row=1, column=1)
-        convert_frame.grid_propagate(0)
-        
-        self._widget_toggles.append(cb_convert)
-        self._widget_toggles.append(self._nud_convert)
-        
-        # Motor Parameters
-        parameter_frame = tk.Frame(motor_frame, width=400, height=50)
-        parameter_frame.place(x=5, y=50)
-        
+        """
         tk.Label(parameter_frame, textvariable=self._lbl_speed, width=15, height=2, anchor="w").grid(row=0, column=0)
         self._txt_speed = tk.Text(parameter_frame, width=8, height=1)
         self._txt_speed.grid(row=0, column=1, sticky="w", padx=(0, 5))
@@ -170,6 +250,8 @@ class Form():
         parameter_frame.grid_propagate(0)
         
         self._widget_toggles.append(self._nud_distance)
+        """
+        # 
         
         # Axis control
         #axis_frame = tk.Frame(motor_frame, width=400, height=400)
@@ -235,6 +317,15 @@ class Form():
     
     def nud_distance_value_updated(self, event=None):
         #self._presenter.MotorStatus.MovePosition = self._distance_val.get()
+        pass
+    
+    def nud_min_wl_value_updated(self, event=None):
+        pass
+    
+    def nud_max_wl_value_updated(self, event=None):
+        pass
+    
+    def nud_inc_value_updated(self, event=None):
         pass
     
     def cb_convert_checked(self):           

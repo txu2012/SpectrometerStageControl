@@ -6,7 +6,7 @@ class SpectrometerControl():
         self._wavelengths = self._spectrometer.wavelengths()
         self._spectrometer.integration_time_micros(integration_time_micros)
         self._header = None
-        
+
     def __enter__(self):
         return self
     
@@ -29,11 +29,10 @@ class SpectrometerControl():
 
         devices = list_devices()
         spec = Spectrometer(devices[1])
-
         spec = Spectrometer.from_serial_number("F01234")
-
         spec.integration_time_micros(100000)
-        
+        spec.f.eeprom.eeprom_read_slot(4)
+        spec.features['eeprom'][0].eeprom_read_slot(4)
         wavelengths = spec.wavelengths()
         print(wavelengths)
         
@@ -43,3 +42,5 @@ class SpectrometerControl():
         wave, ints = spec.spectrum()
         print(wave)
         print(ints)
+        
+        spec.features['pixel_binning'][0].set_binning_factor()

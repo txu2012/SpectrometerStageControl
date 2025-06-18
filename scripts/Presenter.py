@@ -55,9 +55,8 @@ class Presenter():
         
         while(current_pos < final_pos):
             # get data
-            data.append([current_pos, wavelengths, intensities])
             wavelengths, intensities = self._spectrometer.get_spectrum()
-            
+            data.append({"position" : current_pos, "wavelengths" : wavelengths, "intensities" : intensities})
             print(f'position: {current_pos}, wavelengths: {wavelengths}, intensities: {intensities}')
             
             # move to next position
@@ -67,16 +66,17 @@ class Presenter():
         print('Finished collecting dataset')
         return data
     
-    def process_data(self, data, wavelength_range):
-        print('Process data')
+    def trim_data(self, src, wavelength_range):
+        print('Trim data')
         
-        processed_data = list()
-        for position, wavelengths, intensities in data:
-            print(f'position: {position}')
+        trimmed_data = list()
+        for data in src:            
+            print(f'position: {data["position"]}')
             
-            min_index = (np.abs(wavelengths - wavelength_range[0])).argmin()
-            max_index = (np.abs(wavelengths - wavelength_range[1])).argmin()
+            min_index = (np.abs(data["wavelengths"] - wavelength_range[0])).argmin()
+            max_index = (np.abs(data["wavelengths"] - wavelength_range[1])).argmin()
             
-            processed_data.append((position, intensities[min_index:max_index]))
+            trimmed_data.append((data["position"], data["wavelengths"][min_index:max_index+1], data["intensities"][min_index:max_index+1]))
             
-        return processed_data
+        return trimmed_data
+            
