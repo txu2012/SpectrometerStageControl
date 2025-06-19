@@ -65,12 +65,15 @@ namespace SpectrometerStageControl
                 cbSpectrometer.Enabled = true;
             }
 
-            pnControl.Enabled = (presenter.SpectrometerConnected || presenter.StageConnected);
-            gbStage.Enabled = presenter.StageConnected;
-            gbSpectrometer.Enabled = presenter.SpectrometerConnected;
+            //pnControl.Enabled = (presenter.SpectrometerConnected || presenter.StageConnected);
+            //gbStage.Enabled = presenter.StageConnected;
+            //gbSpectrometer.Enabled = presenter.SpectrometerConnected;
 
             if (gbStage.Enabled)
                 UpdateStageDisplay();
+
+            if (gbSpectrometer.Enabled)
+                UpdateSpectrometerDisplay();
 
             updatingDisplay = false;
         }
@@ -81,6 +84,19 @@ namespace SpectrometerStageControl
             {
                 txtHomed.Text = (presenter.Stage.IsHomed) ? "Yes" : "No";
                 txtPosition.Text = presenter.Stage.CurrentPosition.ToString();
+
+                nudStageMoveBy.Value = (decimal)presenter.MoveBy_mm;
+                nudStageRange.Value = (decimal)presenter.MoveRange_mm;
+            }
+        }
+
+        private void UpdateSpectrometerDisplay()
+        {
+            if (presenter.SpectrometerConnected)
+            {
+                nudCenterWave.Value = (decimal)presenter.CenterWavelength;
+                nudWaveRange.Value = (decimal)presenter.WavelengthRange;
+                nudIntegrationUs.Value = (decimal)presenter.IntegrationTime_us;
             }
         }
 
@@ -97,6 +113,7 @@ namespace SpectrometerStageControl
 
         private void RefreshSpectrometer()
         {
+            presenter.RefreshSpectrometerDevices();
             cbStage.DataSource = presenter.SpectrometerDevices.Select(x => x.Id + "" + x.Name).ToList();
         }
         #endregion
@@ -150,48 +167,54 @@ namespace SpectrometerStageControl
         #region Stage Control
         private void btnHome_Click(object sender, EventArgs e)
         {
-            presenter.Stage.Home();
+            presenter.StageHome();
             tmrMain.Enabled = true;
         }
 
         private void btnStageStop_Click(object sender, EventArgs e)
         {
-            presenter.Stage.Stop();
+            presenter.StageStop();
             tmrMain.Enabled = true;
         }
 
         private void btnMoveByNeg_Click(object sender, EventArgs e)
         {
-            presenter.Stage.MoveRelative(false, nudStageMoveBy.Value);
+            presenter.StageMoveRelative(false, nudStageMoveBy.Value);
             tmrMain.Enabled = true;
         }
 
         private void btnMoveByPos_Click(object sender, EventArgs e)
         {
-            presenter.Stage.MoveRelative(true, nudStageMoveBy.Value);
+            presenter.StageMoveRelative(true, nudStageMoveBy.Value);
             tmrMain.Enabled = true;
         }
 
         private void btnContFwd_Click(object sender, EventArgs e)
         {
-            presenter.Stage.MoveContiuous(true);
+            presenter.StageMoveContinuous(true);
             tmrMain.Enabled = true;
         }
 
         private void btnContBack_Click(object sender, EventArgs e)
         {
-            presenter.Stage.MoveContiuous(false);
+            presenter.StageMoveContinuous(false);
             tmrMain.Enabled = true;
         }
 
         private void nudStageMoveBy_ValueChanged(object sender, EventArgs e)
         {
+            if (updatingDisplay) return;
+            presenter.MoveBy_mm = (decimal)nudStageMoveBy.Value;
 
+            UpdateDisplay();
         }
 
         private void nudStageRange_ValueChanged(object sender, EventArgs e)
         {
+            if (updatingDisplay) return;
+            presenter.MoveRange_mm = (decimal)nudStageRange.Value;
 
+            UpdateDisplay();
         }
         #endregion
 
@@ -199,29 +222,36 @@ namespace SpectrometerStageControl
 
         private void btnSpectrumFull_Click(object sender, EventArgs e)
         {
-
+            presenter.GetFullSpectrum();
         }
 
         private void btnSpectrumRange_Click(object sender, EventArgs e)
         {
-
+            presenter.GetSpectrumAtRange();
         }
 
         private void btnChart_Click(object sender, EventArgs e)
         {
-            
             if (formChart == null || formChart.IsDisposed)
                 formChart = new FormChart(presenter);
+
+            formChart.Show();
         }
 
         private void nudCenterWave_ValueChanged(object sender, EventArgs e)
         {
+            if (updatingDisplay) return;
+            presenter.CenterWavelength = (double)nudCenterWave.Value;
 
+            UpdateDisplay();
         }
 
         private void nudWaveRange_ValueChanged(object sender, EventArgs e)
         {
+            if (updatingDisplay) return;
+            presenter.WavelengthRange = (double)nudWaveRange.Value;
 
+            UpdateDisplay();
         }
 
         private void nudWaveInc_ValueChanged(object sender, EventArgs e)
@@ -231,13 +261,21 @@ namespace SpectrometerStageControl
 
         private void nudIntegrationUs_ValueChanged(object sender, EventArgs e)
         {
+            if (updatingDisplay) return;
+            presenter.IntegrationTime_us = (long)nudIntegrationUs.Value;
 
+            UpdateDisplay();
         }
         #endregion
 
         private void btnRun_Click(object sender, EventArgs e)
         {
-            presenter.RunLength();
+            presenter.RunLength(
+                nudStageMoveBy.Value,
+                nudStageRange.Value,
+                (double)nudCenterWave.Value,
+                (double)nudWaveRange.Value,
+                (long)nudIntegrationUs.Value);
         }
 
         private void tmrMain_Tick(object sender, EventArgs e)
@@ -250,6 +288,17 @@ namespace SpectrometerStageControl
             {
                 tmrMain.Enabled = false;
             }
+        }
+
+        private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (presenter.StageConnected)
+                presenter.DisconnectStage();
+            if (presenter.SpectrometerConnected)
+                presenter.DisconnectSpectrometer();
+            
+            presenter.Stage.Dispose();
+            presenter.Spectrometer.Dispose();
         }
     }
 }

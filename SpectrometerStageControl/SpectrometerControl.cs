@@ -24,7 +24,7 @@ namespace SpectrometerStageControl
         private int spectrumLength_;
         private bool connected;
 
-        public double[] Wavelengths;
+        public double[] Wavelengths { get; private set; }
         public bool Connected 
         {
             get { return connected; }
@@ -58,7 +58,7 @@ namespace SpectrometerStageControl
             devicesList_ = new List<Devices>();
         }
 
-        public void Open(int deviceId)
+        public void Connect(int deviceId)
         {
             int errCode = 0;
             var device = devicesList_.Find(d => d.Id == deviceId);
@@ -76,7 +76,7 @@ namespace SpectrometerStageControl
             }
         }
 
-        public void Close()
+        public void Disconnect()
         {
             int errCode = 0;
             if (device_.InUse)
@@ -89,10 +89,19 @@ namespace SpectrometerStageControl
             connected = false;
         }
 
-        public double[] GetFullSpectrum()
+        public void SetIntegrationTime(long timeUs)
+        {
+            int errCode = 0;
+            instance_.setIntegrationTimeMicros(device_.Id, ref errCode, (uint)timeUs);
+
+            if (isError(errCode))
+                throw new InvalidOperationException($"Function setIntegrationTimeMicros failed with error code {errCode}");
+        }
+
+        public (double[], double[]) GetFullSpectrum()
         {
             (_, var intensities) = getSpectrumAndWavelengths();
-            return intensities; 
+            return (Wavelengths, intensities); 
         }
 
         public List<(double, double)> GetSpectrumAtRange(double lo, double hi, int increments = 0)

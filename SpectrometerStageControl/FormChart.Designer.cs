@@ -35,6 +35,7 @@ namespace SpectrometerStageControl
             System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.tmrUpdate = new System.Windows.Forms.Timer(this.components);
+            this.cbStart = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -48,25 +49,43 @@ namespace SpectrometerStageControl
             this.chart1.ChartAreas.Add(chartArea1);
             legend1.Name = "Legend1";
             this.chart1.Legends.Add(legend1);
-            this.chart1.Location = new System.Drawing.Point(6, 6);
+            this.chart1.Location = new System.Drawing.Point(6, 36);
             this.chart1.Name = "chart1";
             series1.ChartArea = "ChartArea1";
             series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
             series1.Legend = "Legend1";
             series1.Name = "Series1";
             this.chart1.Series.Add(series1);
-            this.chart1.Size = new System.Drawing.Size(1288, 684);
+            this.chart1.Size = new System.Drawing.Size(1288, 654);
             this.chart1.TabIndex = 0;
             this.chart1.Text = "chIntensities";
+            // 
+            // tmrUpdate
+            // 
+            this.tmrUpdate.Tick += new System.EventHandler(this.tmrUpdate_Tick);
+            // 
+            // cbStart
+            // 
+            this.cbStart.Appearance = System.Windows.Forms.Appearance.Button;
+            this.cbStart.Location = new System.Drawing.Point(4, 6);
+            this.cbStart.Name = "cbStart";
+            this.cbStart.Size = new System.Drawing.Size(80, 23);
+            this.cbStart.TabIndex = 1;
+            this.cbStart.Text = "Start";
+            this.cbStart.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.cbStart.UseVisualStyleBackColor = true;
+            this.cbStart.CheckedChanged += new System.EventHandler(this.cbStart_CheckedChanged);
             // 
             // FormChart
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1300, 697);
+            this.Controls.Add(this.cbStart);
             this.Controls.Add(this.chart1);
             this.Name = "FormChart";
             this.Text = "FormChart";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormChart_FormClosing);
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).EndInit();
             this.ResumeLayout(false);
 
@@ -76,5 +95,6 @@ namespace SpectrometerStageControl
 
         private System.Windows.Forms.DataVisualization.Charting.Chart chart1;
         private System.Windows.Forms.Timer tmrUpdate;
+        private System.Windows.Forms.CheckBox cbStart;
     }
 }

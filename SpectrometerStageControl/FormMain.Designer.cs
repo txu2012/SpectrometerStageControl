@@ -205,12 +205,11 @@ namespace SpectrometerStageControl
             // pnControl
             // 
             this.pnControl.Controls.Add(this.btnRun);
-            this.pnControl.Controls.Add(this.rtbLog);
             this.pnControl.Controls.Add(this.gbSpectrometer);
             this.pnControl.Controls.Add(this.gbStage);
             this.pnControl.Location = new System.Drawing.Point(2, 108);
             this.pnControl.Name = "pnControl";
-            this.pnControl.Size = new System.Drawing.Size(794, 458);
+            this.pnControl.Size = new System.Drawing.Size(434, 450);
             this.pnControl.TabIndex = 1;
             // 
             // btnRun
@@ -219,14 +218,14 @@ namespace SpectrometerStageControl
             this.btnRun.Name = "btnRun";
             this.btnRun.Size = new System.Drawing.Size(105, 32);
             this.btnRun.TabIndex = 11;
-            this.btnRun.Text = "Run";
+            this.btnRun.Text = "Run Set";
             this.btnRun.UseVisualStyleBackColor = true;
             this.btnRun.Click += new System.EventHandler(this.btnRun_Click);
             // 
             // rtbLog
             // 
             this.rtbLog.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.rtbLog.Location = new System.Drawing.Point(434, 10);
+            this.rtbLog.Location = new System.Drawing.Point(438, 118);
             this.rtbLog.Name = "rtbLog";
             this.rtbLog.Size = new System.Drawing.Size(354, 440);
             this.rtbLog.TabIndex = 2;
@@ -313,7 +312,7 @@ namespace SpectrometerStageControl
             this.btnChart.Name = "btnChart";
             this.btnChart.Size = new System.Drawing.Size(105, 32);
             this.btnChart.TabIndex = 12;
-            this.btnChart.Text = "Visualize";
+            this.btnChart.Text = "Chart";
             this.btnChart.UseVisualStyleBackColor = true;
             this.btnChart.Click += new System.EventHandler(this.btnChart_Click);
             // 
@@ -468,18 +467,18 @@ namespace SpectrometerStageControl
             // 
             // nudStageRange
             // 
-            this.nudStageRange.DecimalPlaces = 5;
+            this.nudStageRange.DecimalPlaces = 6;
             this.nudStageRange.Increment = new decimal(new int[] {
             1,
             0,
             0,
-            131072});
+            262144});
             this.nudStageRange.Location = new System.Drawing.Point(142, 150);
             this.nudStageRange.Minimum = new decimal(new int[] {
-            1,
+            8,
             0,
             0,
-            131072});
+            262144});
             this.nudStageRange.Name = "nudStageRange";
             this.nudStageRange.Size = new System.Drawing.Size(74, 20);
             this.nudStageRange.TabIndex = 18;
@@ -537,26 +536,26 @@ namespace SpectrometerStageControl
             // 
             // nudStageMoveBy
             // 
-            this.nudStageMoveBy.DecimalPlaces = 5;
+            this.nudStageMoveBy.DecimalPlaces = 6;
             this.nudStageMoveBy.Increment = new decimal(new int[] {
             1,
             0,
             0,
-            131072});
+            262144});
             this.nudStageMoveBy.Location = new System.Drawing.Point(142, 108);
             this.nudStageMoveBy.Minimum = new decimal(new int[] {
-            1,
+            8,
             0,
             0,
-            131072});
+            262144});
             this.nudStageMoveBy.Name = "nudStageMoveBy";
             this.nudStageMoveBy.Size = new System.Drawing.Size(74, 20);
             this.nudStageMoveBy.TabIndex = 12;
             this.nudStageMoveBy.Value = new decimal(new int[] {
-            1,
+            8,
             0,
             0,
-            0});
+            262144});
             this.nudStageMoveBy.ValueChanged += new System.EventHandler(this.nudStageMoveBy_ValueChanged);
             // 
             // btnHome
@@ -610,10 +609,12 @@ namespace SpectrometerStageControl
             this.ClientSize = new System.Drawing.Size(800, 591);
             this.Controls.Add(this.pnControl);
             this.Controls.Add(this.gbConnection);
+            this.Controls.Add(this.rtbLog);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.Name = "FormMain";
             this.Text = "Spectrometer Acquisition";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormMain_FormClosing);
             this.gbConnection.ResumeLayout(false);
             this.gbConnection.PerformLayout();
             this.pnControl.ResumeLayout(false);
