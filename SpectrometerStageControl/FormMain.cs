@@ -102,7 +102,7 @@ namespace SpectrometerStageControl
 
         public void Log(string msg) 
         {
-            rtbLog.AppendText(msg + "\r\n");
+            rtbLog.AppendText(msg + "\r\n\r\n");
             rtbLog.ScrollToCaret();
         }
 

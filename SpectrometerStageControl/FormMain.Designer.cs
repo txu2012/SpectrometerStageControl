@@ -227,6 +227,7 @@ namespace SpectrometerStageControl
             this.rtbLog.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.rtbLog.Location = new System.Drawing.Point(438, 118);
             this.rtbLog.Name = "rtbLog";
+            this.rtbLog.ReadOnly = true;
             this.rtbLog.Size = new System.Drawing.Size(354, 440);
             this.rtbLog.TabIndex = 2;
             this.rtbLog.Text = "";

@@ -48,8 +48,6 @@ namespace SpectrometerStageControl
         {
             Spectrometer = new SpectrometerControl();
             Stage = new StageControl();
-
-            RefreshSpectrometerDevices();
         }
 
         #region Connection
