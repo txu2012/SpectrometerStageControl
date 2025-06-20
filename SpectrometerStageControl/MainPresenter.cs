@@ -403,5 +403,11 @@ namespace SpectrometerStageControl
             double timeS = timeFs / 1_000_000_000_000_000.0;
             return (decimal)(lightSpeed_mps * (timeS));
         }
+
+        public decimal MmToFemtosecond(decimal mm)
+        {
+            long lightSpeed_mps = 299792458000;
+            return 0;
+        }
     }
 }
