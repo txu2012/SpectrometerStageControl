@@ -25,17 +25,19 @@ namespace SpectrometerStageControl
             this.presenter.AddChartView(this);
 
             initialize();
+            UpdateDisplay();
         }
 
         private void initialize()
         {
-            chart1.ChartAreas[0].AxisX.Title = "Wavelength";
-            chart1.ChartAreas[0].AxisX.Minimum = Math.Floor(presenter.Wavelengths[0]);
-            chart1.ChartAreas[0].AxisX.Maximum = Math.Ceiling(presenter.Wavelengths[presenter.Wavelengths.Length-1]);
 
-            chart1.ChartAreas[0].AxisY.Title = "Spectrum";
-            chart1.ChartAreas[0].AxisY.Minimum = Math.Floor(presenter.Spectrum[0]);
-            chart1.ChartAreas[0].AxisY.Maximum = Math.Ceiling(presenter.Spectrum[presenter.Spectrum.Length - 1]);
+            chart1.ChartAreas[0].AxisX.Title = "Wavelength";
+            chart1.ChartAreas[0].AxisX.Minimum = Math.Floor(presenter.SpectrumData.Wavelengths.Min());
+            chart1.ChartAreas[0].AxisX.Maximum = Math.Ceiling(presenter.SpectrumData.Wavelengths.Max());
+
+            chart1.ChartAreas[0].AxisY.Title = "Intensity";
+            chart1.ChartAreas[0].AxisY.Minimum = Math.Floor(presenter.SpectrumData.Intensities.Min());
+            chart1.ChartAreas[0].AxisY.Maximum = Math.Ceiling(presenter.SpectrumData.Intensities.Max());
         }
 
         public void UpdateDisplay()
@@ -45,15 +47,36 @@ namespace SpectrometerStageControl
             Series series = new Series();
             series.ChartArea = chart1.ChartAreas[0].Name;
             series.ChartType = SeriesChartType.FastLine;
-            series.Name = "Spectrum";
+            //series.ChartType = SeriesChartType.Column;
+            series.Name = "Intensities";
+
+            var waves = presenter.SpectrumData.Wavelengths;
+            var intensities = (cbNormalize.Checked) ? presenter.SpectrumData.IntensitiesNormalized : presenter.SpectrumData.Intensities;
 
             var points = series.Points;
-            for (int i = 0; i < presenter.Wavelengths.Length; i++)
+            for (int i = 0; i < presenter.SpectrumData.Wavelengths.Length; i++)
             {
-                points.AddXY(presenter.Wavelengths[i], presenter.Spectrum[i]);
+                points.AddXY(waves[i], intensities[i]);
             }
 
             chart1.Series.Add(series);
+        }
+
+        private void updateChartAxes(bool normalize)
+        {
+            if (normalize)
+            {
+                chart1.ChartAreas[0].AxisY.Minimum = 0;
+                chart1.ChartAreas[0].AxisY.Maximum = 1;
+                chart1.ChartAreas[0].CursorY.Interval = 0.01;
+            }
+            else
+            {
+                chart1.ChartAreas[0].AxisY.Minimum = presenter.SpectrumData.Intensities.Min();
+                chart1.ChartAreas[0].AxisY.Maximum = presenter.SpectrumData.Intensities.Max();
+                chart1.ChartAreas[0].CursorY.Interval = 0.1;
+            }
+            UpdateDisplay();
         }
 
         private void cbStart_CheckedChanged(object sender, EventArgs e)
@@ -72,6 +95,19 @@ namespace SpectrometerStageControl
         private void FormChart_FormClosing(object sender, FormClosingEventArgs e)
         {
             presenter.RemoveChartView();
+        }
+
+        private void chart1_CursorPositionChanging(object sender, CursorEventArgs e)
+        {
+            if (e.Axis.AxisName == AxisName.X)
+                lblXPos.Text = e.NewPosition.ToString();
+            else if (e.Axis.AxisName == AxisName.Y)
+                lblYPos.Text = e.NewPosition.ToString();
+        }
+
+        private void cbNormalize_CheckedChanged(object sender, EventArgs e)
+        {
+            updateChartAxes(cbNormalize.Checked);
         }
     }
 }

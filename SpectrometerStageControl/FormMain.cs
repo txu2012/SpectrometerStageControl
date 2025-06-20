@@ -65,9 +65,9 @@ namespace SpectrometerStageControl
                 cbSpectrometer.Enabled = true;
             }
 
-            //pnControl.Enabled = (presenter.SpectrometerConnected || presenter.StageConnected);
-            //gbStage.Enabled = presenter.StageConnected;
-            //gbSpectrometer.Enabled = presenter.SpectrometerConnected;
+            pnControl.Enabled = (presenter.SpectrometerConnected || presenter.StageConnected);
+            gbStage.Enabled = presenter.StageConnected;
+            gbSpectrometer.Enabled = presenter.SpectrometerConnected;
 
             if (gbStage.Enabled)
                 UpdateStageDisplay();

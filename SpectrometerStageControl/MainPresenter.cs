@@ -18,6 +18,65 @@ namespace SpectrometerStageControl
 
     public interface IChartView : IView { }
 
+    public struct SpectrumData
+    {
+        private double[] wavelengths;
+        private double[] intensities;
+        public double[] Wavelengths 
+        { 
+            get 
+            { 
+                return this.wavelengths; 
+            } 
+            set
+            {
+                this.wavelengths = value;
+            }
+        }
+        public double[] Intensities 
+        { 
+            get 
+            { 
+                return this.intensities; 
+            } 
+            set
+            {
+                this.intensities = value;
+            }
+        }
+
+        public double[] WavelengthsNormalized
+        {
+            get
+            {
+                return normalize(this.wavelengths);
+            }
+        }
+
+        public double[] IntensitiesNormalized
+        {
+            get
+            {
+                return normalize(this.intensities);
+            }
+        }
+        private double[] normalize(double[] data)
+        {
+            return data.Select(d => d/data.Max()).ToArray();
+        }
+
+        public SpectrumData(double[] wave, double[] intensities)
+        {
+            this.wavelengths = wave;
+            this.intensities = intensities;
+
+        }
+        public SpectrumData DeepCopy()
+        {
+            return new SpectrumData(this.Wavelengths, this.Intensities);
+        }
+    }
+
     public class MainPresenter
     {
         #region Class Members
@@ -33,21 +92,32 @@ namespace SpectrometerStageControl
         public bool SpectrometerConnected { get { return Spectrometer.Connected; } }
         public bool StageConnected { get { return Stage.IsConnected; } }
 
-        //public double[] Wavelengths { get { return Spectrometer.Wavelengths; } }
-        public double[] Wavelengths { get; private set; } = new double[]  { 1, 2, 3, 4 };
-        public double[] Spectrum { get; private set; } = new double[] { 10, 20, 30, 40 };
+        private SpectrumData spectrumData;
+        public SpectrumData SpectrumData { get { return spectrumData; } }
         public double CenterWavelength { get; set; } = 400;
         public double WavelengthRange { get; set; } = 100;
         public long IntegrationTime_us { get; set; } = 10000;
 
         public decimal MoveBy_mm { get; set; } = 0.0008m;
         public decimal MoveRange_mm { get; set; } = 1.00000m;
+        public double Time_fs { get; set; }
         #endregion
 
+        private double FemtosecondToMm(double timeFs)
+        {
+            long lightSpeed_mps = 299792458000;
+            return lightSpeed_mps * timeFs;
+        }
         public MainPresenter() 
         {
             Spectrometer = new SpectrometerControl();
             Stage = new StageControl();
+
+            spectrumData = new SpectrumData()
+            {
+                Wavelengths = new double[] { 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000 },
+                Intensities = new double[] { 10, 20, 30, 40, 32, 31, 22, 6, 2, 1 }
+            };
         }
 
         #region Connection
@@ -130,7 +200,7 @@ namespace SpectrometerStageControl
             {
                 mainView.Log($"Starting set.");
                 // Steps(distance), Wavelengths, Spectrum
-                List<(int, double[], double[])> data = new List<(int, double[], double[])>();
+                List<(int, SpectrumData)> data = new List<(int, SpectrumData)>();
 
                 decimal initialPosition = -moveRange_mm;
                 decimal finalPosition = moveRange_mm;
@@ -149,7 +219,7 @@ namespace SpectrometerStageControl
 
                 // Get first set of data
                 GetSpectrumAtRange();
-                data.Add((step, Wavelengths, Spectrum));
+                data.Add((step, SpectrumData.DeepCopy()));
 
                 while (Stage.CurrentPosition < finalPosition)
                 {
@@ -166,7 +236,7 @@ namespace SpectrometerStageControl
                     GetSpectrumAtRange();
 
                     // Append new data
-                    data.Add((step, Wavelengths, Spectrum));
+                    data.Add((step, SpectrumData.DeepCopy()));
                 }
 
                 mainView.Log($"Finished running set.");
@@ -205,7 +275,9 @@ namespace SpectrometerStageControl
             {
                 if (!SpectrometerConnected) throw new InvalidOperationException("Spectrometer Not Connected.");
 
-                (Wavelengths, Spectrum) = Spectrometer.GetFullSpectrum();
+                var (wavelengths, spectrum) = Spectrometer.GetFullSpectrum();
+                spectrumData.Wavelengths = wavelengths;
+                spectrumData.Intensities = spectrum;
 
                 if (chartView != null) chartView.UpdateDisplay();
             }
@@ -228,8 +300,10 @@ namespace SpectrometerStageControl
                     throw new InvalidOperationException("Wavelength range not within range of spectrometer.");
 
                 var spec = Spectrometer.GetSpectrumAtRange(lo, hi);
-                Wavelengths = spec.Select(s => s.Item1).ToArray();
-                Spectrum = spec.Select(s => s.Item2).ToArray();
+                var wavelengths = spec.Select(s => s.Item1).ToArray();
+                var spectrum = spec.Select(s => s.Item2).ToArray();
+                spectrumData.Wavelengths = wavelengths;
+                spectrumData.Intensities = spectrum;
 
                 if (chartView != null) chartView.UpdateDisplay();
             }

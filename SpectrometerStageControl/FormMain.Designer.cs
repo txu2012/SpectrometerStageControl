@@ -43,7 +43,6 @@ namespace SpectrometerStageControl
             this.cbStage = new System.Windows.Forms.ComboBox();
             this.pnControl = new System.Windows.Forms.Panel();
             this.btnRun = new System.Windows.Forms.Button();
-            this.rtbLog = new System.Windows.Forms.RichTextBox();
             this.gbSpectrometer = new System.Windows.Forms.GroupBox();
             this.label13 = new System.Windows.Forms.Label();
             this.nudIntegrationUs = new System.Windows.Forms.NumericUpDown();
@@ -74,6 +73,7 @@ namespace SpectrometerStageControl
             this.btnMoveByPos = new System.Windows.Forms.Button();
             this.btnMoveByNeg = new System.Windows.Forms.Button();
             this.btnStageStop = new System.Windows.Forms.Button();
+            this.rtbLog = new System.Windows.Forms.RichTextBox();
             this.tmrMain = new System.Windows.Forms.Timer(this.components);
             this.gbConnection.SuspendLayout();
             this.pnControl.SuspendLayout();
@@ -207,7 +207,7 @@ namespace SpectrometerStageControl
             this.pnControl.Controls.Add(this.btnRun);
             this.pnControl.Controls.Add(this.gbSpectrometer);
             this.pnControl.Controls.Add(this.gbStage);
-            this.pnControl.Location = new System.Drawing.Point(2, 108);
+            this.pnControl.Location = new System.Drawing.Point(2, 92);
             this.pnControl.Name = "pnControl";
             this.pnControl.Size = new System.Drawing.Size(434, 450);
             this.pnControl.TabIndex = 1;
@@ -221,16 +221,6 @@ namespace SpectrometerStageControl
             this.btnRun.Text = "Run Set";
             this.btnRun.UseVisualStyleBackColor = true;
             this.btnRun.Click += new System.EventHandler(this.btnRun_Click);
-            // 
-            // rtbLog
-            // 
-            this.rtbLog.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.rtbLog.Location = new System.Drawing.Point(438, 118);
-            this.rtbLog.Name = "rtbLog";
-            this.rtbLog.ReadOnly = true;
-            this.rtbLog.Size = new System.Drawing.Size(354, 440);
-            this.rtbLog.TabIndex = 2;
-            this.rtbLog.Text = "";
             // 
             // gbSpectrometer
             // 
@@ -599,6 +589,17 @@ namespace SpectrometerStageControl
             this.btnStageStop.UseVisualStyleBackColor = true;
             this.btnStageStop.Click += new System.EventHandler(this.btnStageStop_Click);
             // 
+            // rtbLog
+            // 
+            this.rtbLog.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.rtbLog.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.rtbLog.Location = new System.Drawing.Point(438, 102);
+            this.rtbLog.Name = "rtbLog";
+            this.rtbLog.ReadOnly = true;
+            this.rtbLog.Size = new System.Drawing.Size(354, 440);
+            this.rtbLog.TabIndex = 2;
+            this.rtbLog.Text = "";
+            // 
             // tmrMain
             // 
             this.tmrMain.Tick += new System.EventHandler(this.tmrMain_Tick);
@@ -607,7 +608,7 @@ namespace SpectrometerStageControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 591);
+            this.ClientSize = new System.Drawing.Size(800, 550);
             this.Controls.Add(this.pnControl);
             this.Controls.Add(this.gbConnection);
             this.Controls.Add(this.rtbLog);
