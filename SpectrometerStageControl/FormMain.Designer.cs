@@ -57,6 +57,8 @@ namespace SpectrometerStageControl
             this.btnSpectrumFull = new System.Windows.Forms.Button();
             this.btnSpectrumRange = new System.Windows.Forms.Button();
             this.gbStage = new System.Windows.Forms.GroupBox();
+            this.label14 = new System.Windows.Forms.Label();
+            this.nudTimeFs = new System.Windows.Forms.NumericUpDown();
             this.btnContFwd = new System.Windows.Forms.Button();
             this.btnContBack = new System.Windows.Forms.Button();
             this.label12 = new System.Windows.Forms.Label();
@@ -75,6 +77,10 @@ namespace SpectrometerStageControl
             this.btnStageStop = new System.Windows.Forms.Button();
             this.rtbLog = new System.Windows.Forms.RichTextBox();
             this.tmrMain = new System.Windows.Forms.Timer(this.components);
+            this.btnSetMm = new System.Windows.Forms.Button();
+            this.btnSetMmRange = new System.Windows.Forms.Button();
+            this.label15 = new System.Windows.Forms.Label();
+            this.nudTimeRangeFs = new System.Windows.Forms.NumericUpDown();
             this.gbConnection.SuspendLayout();
             this.pnControl.SuspendLayout();
             this.gbSpectrometer.SuspendLayout();
@@ -83,8 +89,10 @@ namespace SpectrometerStageControl
             ((System.ComponentModel.ISupportInitialize)(this.nudWaveInc)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudWaveRange)).BeginInit();
             this.gbStage.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nudTimeFs)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudStageRange)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudStageMoveBy)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nudTimeRangeFs)).BeginInit();
             this.SuspendLayout();
             // 
             // gbConnection
@@ -214,7 +222,7 @@ namespace SpectrometerStageControl
             // 
             // btnRun
             // 
-            this.btnRun.Location = new System.Drawing.Point(314, 396);
+            this.btnRun.Location = new System.Drawing.Point(314, 402);
             this.btnRun.Name = "btnRun";
             this.btnRun.Size = new System.Drawing.Size(105, 32);
             this.btnRun.TabIndex = 11;
@@ -236,7 +244,7 @@ namespace SpectrometerStageControl
             this.gbSpectrometer.Controls.Add(this.nudWaveRange);
             this.gbSpectrometer.Controls.Add(this.btnSpectrumFull);
             this.gbSpectrometer.Controls.Add(this.btnSpectrumRange);
-            this.gbSpectrometer.Location = new System.Drawing.Point(8, 202);
+            this.gbSpectrometer.Location = new System.Drawing.Point(8, 216);
             this.gbSpectrometer.Name = "gbSpectrometer";
             this.gbSpectrometer.Size = new System.Drawing.Size(420, 174);
             this.gbSpectrometer.TabIndex = 1;
@@ -386,6 +394,12 @@ namespace SpectrometerStageControl
             // 
             // gbStage
             // 
+            this.gbStage.Controls.Add(this.btnSetMmRange);
+            this.gbStage.Controls.Add(this.label15);
+            this.gbStage.Controls.Add(this.nudTimeRangeFs);
+            this.gbStage.Controls.Add(this.btnSetMm);
+            this.gbStage.Controls.Add(this.label14);
+            this.gbStage.Controls.Add(this.nudTimeFs);
             this.gbStage.Controls.Add(this.btnContFwd);
             this.gbStage.Controls.Add(this.btnContBack);
             this.gbStage.Controls.Add(this.label12);
@@ -404,10 +418,42 @@ namespace SpectrometerStageControl
             this.gbStage.Controls.Add(this.btnStageStop);
             this.gbStage.Location = new System.Drawing.Point(8, 6);
             this.gbStage.Name = "gbStage";
-            this.gbStage.Size = new System.Drawing.Size(420, 190);
+            this.gbStage.Size = new System.Drawing.Size(420, 204);
             this.gbStage.TabIndex = 0;
             this.gbStage.TabStop = false;
             this.gbStage.Text = "Stage";
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.Location = new System.Drawing.Point(46, 106);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(47, 13);
+            this.label14.TabIndex = 25;
+            this.label14.Text = "Time (fs)";
+            // 
+            // nudTimeFs
+            // 
+            this.nudTimeFs.Location = new System.Drawing.Point(96, 104);
+            this.nudTimeFs.Maximum = new decimal(new int[] {
+            100000,
+            0,
+            0,
+            0});
+            this.nudTimeFs.Minimum = new decimal(new int[] {
+            3,
+            0,
+            0,
+            0});
+            this.nudTimeFs.Name = "nudTimeFs";
+            this.nudTimeFs.Size = new System.Drawing.Size(74, 20);
+            this.nudTimeFs.TabIndex = 24;
+            this.nudTimeFs.Value = new decimal(new int[] {
+            3,
+            0,
+            0,
+            0});
+            this.nudTimeFs.ValueChanged += new System.EventHandler(this.nudTimeFs_ValueChanged);
             // 
             // btnContFwd
             // 
@@ -432,7 +478,7 @@ namespace SpectrometerStageControl
             // label12
             // 
             this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(14, 168);
+            this.label12.Location = new System.Drawing.Point(208, 162);
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(79, 13);
             this.label12.TabIndex = 21;
@@ -441,7 +487,7 @@ namespace SpectrometerStageControl
             // label11
             // 
             this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(14, 152);
+            this.label11.Location = new System.Drawing.Point(208, 146);
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(124, 13);
             this.label11.TabIndex = 20;
@@ -450,7 +496,7 @@ namespace SpectrometerStageControl
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(14, 136);
+            this.label3.Location = new System.Drawing.Point(208, 130);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(117, 13);
             this.label3.TabIndex = 19;
@@ -464,7 +510,7 @@ namespace SpectrometerStageControl
             0,
             0,
             262144});
-            this.nudStageRange.Location = new System.Drawing.Point(142, 150);
+            this.nudStageRange.Location = new System.Drawing.Point(336, 144);
             this.nudStageRange.Minimum = new decimal(new int[] {
             8,
             0,
@@ -519,7 +565,7 @@ namespace SpectrometerStageControl
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(60, 110);
+            this.label7.Location = new System.Drawing.Point(20, 134);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(74, 13);
             this.label7.TabIndex = 13;
@@ -533,7 +579,7 @@ namespace SpectrometerStageControl
             0,
             0,
             262144});
-            this.nudStageMoveBy.Location = new System.Drawing.Point(142, 108);
+            this.nudStageMoveBy.Location = new System.Drawing.Point(96, 132);
             this.nudStageMoveBy.Minimum = new decimal(new int[] {
             8,
             0,
@@ -543,10 +589,10 @@ namespace SpectrometerStageControl
             this.nudStageMoveBy.Size = new System.Drawing.Size(74, 20);
             this.nudStageMoveBy.TabIndex = 12;
             this.nudStageMoveBy.Value = new decimal(new int[] {
-            8,
+            899,
             0,
             0,
-            262144});
+            393216});
             this.nudStageMoveBy.ValueChanged += new System.EventHandler(this.nudStageMoveBy_ValueChanged);
             // 
             // btnHome
@@ -561,7 +607,7 @@ namespace SpectrometerStageControl
             // 
             // btnMoveByPos
             // 
-            this.btnMoveByPos.Location = new System.Drawing.Point(314, 102);
+            this.btnMoveByPos.Location = new System.Drawing.Point(88, 156);
             this.btnMoveByPos.Name = "btnMoveByPos";
             this.btnMoveByPos.Size = new System.Drawing.Size(72, 32);
             this.btnMoveByPos.TabIndex = 5;
@@ -571,7 +617,7 @@ namespace SpectrometerStageControl
             // 
             // btnMoveByNeg
             // 
-            this.btnMoveByNeg.Location = new System.Drawing.Point(236, 102);
+            this.btnMoveByNeg.Location = new System.Drawing.Point(10, 156);
             this.btnMoveByNeg.Name = "btnMoveByNeg";
             this.btnMoveByNeg.Size = new System.Drawing.Size(72, 32);
             this.btnMoveByNeg.TabIndex = 2;
@@ -604,6 +650,58 @@ namespace SpectrometerStageControl
             // 
             this.tmrMain.Tick += new System.EventHandler(this.tmrMain_Tick);
             // 
+            // btnSetMm
+            // 
+            this.btnSetMm.Location = new System.Drawing.Point(172, 102);
+            this.btnSetMm.Name = "btnSetMm";
+            this.btnSetMm.Size = new System.Drawing.Size(52, 23);
+            this.btnSetMm.TabIndex = 26;
+            this.btnSetMm.Text = "Set mm";
+            this.btnSetMm.UseVisualStyleBackColor = true;
+            this.btnSetMm.Click += new System.EventHandler(this.btnSetMm_Click);
+            // 
+            // btnSetMmRange
+            // 
+            this.btnSetMmRange.Location = new System.Drawing.Point(358, 102);
+            this.btnSetMmRange.Name = "btnSetMmRange";
+            this.btnSetMmRange.Size = new System.Drawing.Size(52, 23);
+            this.btnSetMmRange.TabIndex = 29;
+            this.btnSetMmRange.Text = "Set mm";
+            this.btnSetMmRange.UseVisualStyleBackColor = true;
+            this.btnSetMmRange.Click += new System.EventHandler(this.btnSetMmRange_Click);
+            // 
+            // label15
+            // 
+            this.label15.AutoSize = true;
+            this.label15.Location = new System.Drawing.Point(228, 106);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(47, 13);
+            this.label15.TabIndex = 28;
+            this.label15.Text = "Time (fs)";
+            // 
+            // nudTimeRangeFs
+            // 
+            this.nudTimeRangeFs.Location = new System.Drawing.Point(278, 104);
+            this.nudTimeRangeFs.Maximum = new decimal(new int[] {
+            100000,
+            0,
+            0,
+            0});
+            this.nudTimeRangeFs.Minimum = new decimal(new int[] {
+            3,
+            0,
+            0,
+            0});
+            this.nudTimeRangeFs.Name = "nudTimeRangeFs";
+            this.nudTimeRangeFs.Size = new System.Drawing.Size(74, 20);
+            this.nudTimeRangeFs.TabIndex = 27;
+            this.nudTimeRangeFs.Value = new decimal(new int[] {
+            3,
+            0,
+            0,
+            0});
+            this.nudTimeRangeFs.ValueChanged += new System.EventHandler(this.nudTimeRangeFs_ValueChanged);
+            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -628,8 +726,10 @@ namespace SpectrometerStageControl
             ((System.ComponentModel.ISupportInitialize)(this.nudWaveRange)).EndInit();
             this.gbStage.ResumeLayout(false);
             this.gbStage.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nudTimeFs)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudStageRange)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudStageMoveBy)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nudTimeRangeFs)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -681,6 +781,12 @@ namespace SpectrometerStageControl
         private System.Windows.Forms.Button btnSpecDisconnect;
         private System.Windows.Forms.Button btnSpecConnect;
         private System.Windows.Forms.Button btnSpecRefresh;
+        private System.Windows.Forms.NumericUpDown nudTimeFs;
+        private System.Windows.Forms.Label label14;
+        private System.Windows.Forms.Button btnSetMm;
+        private System.Windows.Forms.Button btnSetMmRange;
+        private System.Windows.Forms.Label label15;
+        private System.Windows.Forms.NumericUpDown nudTimeRangeFs;
     }
 }
 

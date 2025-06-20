@@ -65,9 +65,9 @@ namespace SpectrometerStageControl
                 cbSpectrometer.Enabled = true;
             }
 
-            pnControl.Enabled = (presenter.SpectrometerConnected || presenter.StageConnected);
-            gbStage.Enabled = presenter.StageConnected;
-            gbSpectrometer.Enabled = presenter.SpectrometerConnected;
+            //pnControl.Enabled = (presenter.SpectrometerConnected || presenter.StageConnected);
+            //gbStage.Enabled = presenter.StageConnected;
+            //gbSpectrometer.Enabled = presenter.SpectrometerConnected;
 
             if (gbStage.Enabled)
                 UpdateStageDisplay();
@@ -80,24 +80,20 @@ namespace SpectrometerStageControl
 
         private void UpdateStageDisplay()
         {
-            if (presenter.StageConnected)
-            {
-                txtHomed.Text = (presenter.Stage.IsHomed) ? "Yes" : "No";
-                txtPosition.Text = presenter.Stage.CurrentPosition.ToString();
+            txtHomed.Text = (presenter.Stage.IsHomed) ? "Yes" : "No";
+            txtPosition.Text = presenter.Stage.CurrentPosition.ToString();
 
-                nudStageMoveBy.Value = (decimal)presenter.MoveBy_mm;
-                nudStageRange.Value = (decimal)presenter.MoveRange_mm;
-            }
+            nudStageMoveBy.Value = (decimal)presenter.MoveBy_mm;
+            nudStageRange.Value = (decimal)presenter.MoveRange_mm;
+            nudTimeFs.Value = (decimal)presenter.TimeMove_fs;
+            nudTimeRangeFs.Value = (decimal)presenter.TimeRange_fs;
         }
 
         private void UpdateSpectrometerDisplay()
         {
-            if (presenter.SpectrometerConnected)
-            {
-                nudCenterWave.Value = (decimal)presenter.CenterWavelength;
-                nudWaveRange.Value = (decimal)presenter.WavelengthRange;
-                nudIntegrationUs.Value = (decimal)presenter.IntegrationTime_us;
-            }
+            nudCenterWave.Value = (decimal)presenter.CenterWavelength;
+            nudWaveRange.Value = (decimal)presenter.WavelengthRange;
+            nudIntegrationUs.Value = (decimal)presenter.IntegrationTime_us;
         }
 
         public void Log(string msg) 
@@ -213,6 +209,42 @@ namespace SpectrometerStageControl
         {
             if (updatingDisplay) return;
             presenter.MoveRange_mm = (decimal)nudStageRange.Value;
+
+            UpdateDisplay();
+        }
+
+        private void btnSetMm_Click(object sender, EventArgs e)
+        {
+            if (updatingDisplay) return;
+            presenter.MoveBy_mm = presenter.FemtosecondToMm((int)nudTimeFs.Value);
+            presenter.TimeMove_fs = (int)nudTimeFs.Value;
+
+            UpdateDisplay();
+        }
+
+        private void nudTimeFs_ValueChanged(object sender, EventArgs e)
+        {
+            if (updatingDisplay) return;
+            presenter.MoveBy_mm = presenter.FemtosecondToMm((int)nudTimeFs.Value);
+            presenter.TimeMove_fs = (int)nudTimeFs.Value;
+
+            UpdateDisplay();
+        }
+
+        private void btnSetMmRange_Click(object sender, EventArgs e)
+        {
+            if (updatingDisplay) return;
+            presenter.MoveRange_mm = presenter.FemtosecondToMm((int)nudTimeRangeFs.Value);
+            presenter.TimeRange_fs = (int)nudTimeRangeFs.Value;
+
+            UpdateDisplay();
+        }
+
+        private void nudTimeRangeFs_ValueChanged(object sender, EventArgs e)
+        {
+            if (updatingDisplay) return;
+            presenter.MoveRange_mm = presenter.FemtosecondToMm((int)nudTimeRangeFs.Value);
+            presenter.TimeRange_fs = (int)nudTimeRangeFs.Value;
 
             UpdateDisplay();
         }

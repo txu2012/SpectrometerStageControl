@@ -98,16 +98,12 @@ namespace SpectrometerStageControl
         public double WavelengthRange { get; set; } = 100;
         public long IntegrationTime_us { get; set; } = 10000;
 
-        public decimal MoveBy_mm { get; set; } = 0.0008m;
+        public decimal MoveBy_mm { get; set; } = 0.000899m;
         public decimal MoveRange_mm { get; set; } = 1.00000m;
-        public double Time_fs { get; set; }
+        public int TimeMove_fs { get; set; } = 3;
+        public int TimeRange_fs { get; set; } = 3335;
         #endregion
 
-        private double FemtosecondToMm(double timeFs)
-        {
-            long lightSpeed_mps = 299792458000;
-            return lightSpeed_mps * timeFs;
-        }
         public MainPresenter() 
         {
             Spectrometer = new SpectrometerControl();
@@ -399,5 +395,13 @@ namespace SpectrometerStageControl
             }
         }
         #endregion
+
+        public decimal FemtosecondToMm(int timeFs)
+        {
+            // Mm / s
+            long lightSpeed_mps = 299792458000;
+            double timeS = timeFs / 1_000_000_000_000_000.0;
+            return (decimal)(lightSpeed_mps * (timeS));
+        }
     }
 }
